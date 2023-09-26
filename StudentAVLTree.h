@@ -1,6 +1,7 @@
 #ifndef STUDENTAVLTREE_H
 #define STUDENTAVLTREE_H
 #include "Student.h"
+#include <stack>
 
 class StudentAVLTree
 {
@@ -14,6 +15,7 @@ public:
     void insert(const std::string &name, unsigned int id);
     void remove(unsigned int id);
     void removeInorder(int n);
+    void backtrackAndBalance(std::stack<Student*> parents);
 
     // Search/traversal
     void searchID(unsigned int id);

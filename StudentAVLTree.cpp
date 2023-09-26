@@ -31,7 +31,11 @@ void StudentAVLTree::insert(const std::string& name, unsigned int id)
     else parent->SetLeft(toAdd);
     std::cout << "successful" << std::endl;
 
-    // Backtrack and balance
+    backtrackAndBalance(parents);
+}
+
+void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
+{
     while (!parents.empty())
     {
         Student *current = parents.top();
