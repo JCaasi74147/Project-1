@@ -1,6 +1,7 @@
 #include "StudentAVLTree.h"
 #include <iostream>
 #include <stack>
+#include <queue>
 
 void StudentAVLTree::insert(const std::string& name, unsigned int id) 
 {
@@ -51,7 +52,10 @@ void StudentAVLTree::remove(unsigned int id)
     {
         if (!current->GetRight() && !current->GetLeft())    // no children
         {
-            if (!parent) return;
+            if (!parent) 
+            {
+                head = nullptr;
+            }
             else
             {
                 if (parent->GetLeft() == current) parent->SetLeft(nullptr);
@@ -123,6 +127,48 @@ void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
     }
 }
 
+
+// Search/traversal
+void StudentAVLTree::searchID(unsigned int id)
+{
+    Student* current = head;
+    while (current)
+    {
+        if (current->GetID() == id)
+        {
+            std::cout << current->GetName() << std::endl;
+            return;
+        }
+        else if (id < current->GetID()) current = current->GetLeft();
+        else current = current->GetRight();
+    }
+    std::cout << "unsuccessful" << std::endl;
+}
+
+void StudentAVLTree::searchName(const std::string &name)
+{
+    std::stack<Student*> students;
+    std::queue<int> IDs;
+    students.push(head);
+    while (!students.empty())
+    {
+        Student *curr = students.top();
+        if (curr->GetName() == name) IDs.push(curr->GetID());
+        if (curr->GetRight()) students.push(curr->GetRight());
+        if (curr->GetLeft()) students.push(curr->GetLeft());
+        students.pop();
+    }
+    if (IDs.empty()) { std::cout << "unsuccessful" << std::endl; }
+    else 
+    {
+        while (!IDs.empty())
+        {
+            printID(IDs.front());
+            IDs.pop();
+        }
+    }
+}
+
 // Utility methods
 Student* StudentAVLTree::rightRotate(Student *y)
 {
@@ -147,6 +193,28 @@ int StudentAVLTree::height(Student *s)
     return std::max(height(s->GetLeft()), height(s->GetRight())) + 1;
 }
 int StudentAVLTree::getBalance(Student *s)
+
 {
     return height(s->GetLeft()) - height(s->GetRight());
+}
+void StudentAVLTree::printID(unsigned int id)
+{
+    if (id > 9999999)
+    {
+        std::cout << id << std::endl;
+    }
+    else
+    {
+        std::string s = "";
+        for (int i = 0; i < 8; i++)
+        {
+            if (id / 10 == 0) s = "0" + s;
+            else 
+            {
+                s = std::to_string(id % i) + s;
+                id /= 10;
+            }
+        }
+        std::cout << s << std::endl;
+    }
 }

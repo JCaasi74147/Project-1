@@ -33,6 +33,7 @@ public:
     Student* leftRotate(Student *x);
     int height(Student *s);
     int getBalance(Student *s);
+    void printID(unsigned int id);
 
 private:
     Student* head;
