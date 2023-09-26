@@ -30,18 +30,6 @@ public:
     bool operator<(const Student &other) const { return ID < other.ID; }
     bool operator>(const Student &other) const { return ID > other.ID; }
 
-    // Helper functions for tree
-    int height(Student *s)
-    {
-        if (!s) return 0;
-        int left = height(s->GetLeft()), right = height(s->GetRight()) + 1;
-        return (left > right) ? left : right;
-    }
-    int getBalance(Student *s)
-    {
-        if (!s) return 0;
-        return height(s->GetLeft()) - height(s->GetRight());
-    }
 private:
     std::string name;
     unsigned int ID;

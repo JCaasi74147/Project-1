@@ -29,6 +29,8 @@ public:
     bool isEmpty() const;
     Student* rightRotate(Student *y);
     Student* leftRotate(Student *x);
+    int height(Student *s);
+    int getBalance(Student *s);
 
 private:
     Student* head;
