@@ -34,6 +34,59 @@ void StudentAVLTree::insert(const std::string& name, unsigned int id)
     backtrackAndBalance(parents);
 }
 
+void StudentAVLTree::remove(unsigned int id)
+{
+    Student *current = head, *parent = nullptr;
+    std::stack<Student*> parents;
+
+    while (current)
+    {
+        parents.push(current);
+        if (id == current->GetID()) break;
+        parent = current;
+        if (id < current->GetID()) current = current->GetLeft();
+        else current = current->GetRight();
+    }
+    if (current)
+    {
+        if (!current->GetRight() && !current->GetLeft())    // no children
+        {
+            if (!parent) return;
+            else
+            {
+                if (parent->GetLeft() == current) parent->SetLeft(nullptr);
+                else parent->SetRight(nullptr);
+            }
+            delete current;
+        }
+        else if (current->GetRight() || current->GetLeft() && !(current->GetRight() && current->GetLeft())) // one child
+        {
+            Student *child = (current->GetRight()) ? current->GetRight() : current->GetLeft();
+            if (!parent) head = child;
+            else if (current == parent->GetRight()) parent->SetRight(child);
+            else parent->SetLeft(child);
+
+        }
+        else    // two children
+        {
+            Student* inorderSuccessor = current->GetRight();
+            while (inorderSuccessor->GetLeft())
+            {
+                inorderSuccessor = inorderSuccessor->GetLeft();
+            }
+            std::string tempName = inorderSuccessor->GetName();
+            int tempID = inorderSuccessor->GetID();
+            remove(tempID);
+            current->SetName(tempName);
+            current->SetID(tempID);
+        }
+        std::cout << "successful" << std::endl;
+    }
+    else { std::cout << "unsuccessful" << std::endl; }
+
+    backtrackAndBalance(parents);
+}
+
 void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
 {
     while (!parents.empty())
