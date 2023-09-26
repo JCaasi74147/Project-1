@@ -154,9 +154,9 @@ void StudentAVLTree::searchName(const std::string &name)
     {
         Student *curr = students.top();
         if (curr->GetName() == name) IDs.push(curr->GetID());
+        students.pop();
         if (curr->GetRight()) students.push(curr->GetRight());
         if (curr->GetLeft()) students.push(curr->GetLeft());
-        students.pop();
     }
     if (IDs.empty()) { std::cout << "unsuccessful" << std::endl; }
     else 
@@ -211,7 +211,7 @@ void StudentAVLTree::printID(unsigned int id)
             if (id / 10 == 0) s = "0" + s;
             else 
             {
-                s = std::to_string(id % i) + s;
+                s = std::to_string(id % 10) + s;
                 id /= 10;
             }
         }
