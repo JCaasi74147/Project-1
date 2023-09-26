@@ -2,17 +2,13 @@
 #include <iostream>
 #include <stack>
 #include <queue>
+#include <iostream>
 
 void StudentAVLTree::insert(const std::string& name, unsigned int id) 
 {
     Student *toAdd = new Student(name, id);
-    if (head == nullptr) 
-    {
-        head = toAdd;
-        return;
-    }
 
-    Student *current = head, *parent = nullptr;
+    Student *current = head, *parent = head;
     std::stack<Student*> parents;
 
     while (current)
@@ -28,11 +24,14 @@ void StudentAVLTree::insert(const std::string& name, unsigned int id)
             return;
         }
     }
-    if (*parent < *toAdd) parent->SetRight(toAdd);
+    if (current == parent && !parent) head = toAdd;
+    else if (*parent < *toAdd) parent->SetRight(toAdd);
     else parent->SetLeft(toAdd);
-    std::cout << "successful" << std::endl;
-
-    backtrackAndBalance(parents);
+    
+    std::cout << "Before Balance:" << std::endl;
+    printRelationship(head, "ROOT");
+    StudentAVLTree::backtrackAndBalance(parents);
+    std::cout << "successful... apparently" << std::endl;
 }
 
 void StudentAVLTree::remove(unsigned int id)
@@ -88,8 +87,10 @@ void StudentAVLTree::remove(unsigned int id)
     }
     else { std::cout << "unsuccessful" << std::endl; }
 
-    backtrackAndBalance(parents);
+    StudentAVLTree::backtrackAndBalance(parents);
 }
+
+void removeInorder(int n) {};
 
 void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
 {
@@ -98,6 +99,7 @@ void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
         Student *current = parents.top();
         parents.pop();
         Student *parentOfCurrent = parents.empty() ? nullptr : parents.top();
+
         Student *newRoot = nullptr;
         int balance = StudentAVLTree::getBalance(current);
         if (balance > 1)    // tree is left heavy
@@ -124,6 +126,8 @@ void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
             }
             else head = newRoot;
         }
+        std::cout << "After Balance:" << std::endl;
+        printRelationship(head, "ROOT");
     }
 }
 
@@ -149,7 +153,7 @@ void StudentAVLTree::searchName(const std::string &name)
 {
     std::stack<Student*> students;
     std::queue<int> IDs;
-    students.push(head);
+    if (head) students.push(head);
     while (!students.empty())
     {
         Student *curr = students.top();
@@ -169,7 +173,43 @@ void StudentAVLTree::searchName(const std::string &name)
     }
 }
 
+std::vector<std::string> StudentAVLTree::inorderTraversal(Student* current) {
+    std::vector<std::string> names;
+    if (current == nullptr) return names;
+    
+    auto left_names = inorderTraversal(current->GetLeft());
+    names.insert(names.end(), left_names.begin(), left_names.end());
+    
+    names.push_back(current->GetName());
+    
+    auto right_names = inorderTraversal(current->GetRight());
+    names.insert(names.end(), right_names.begin(), right_names.end());
+    
+    return names;
+}
+
+void StudentAVLTree::printInorder() {
+    std::vector<std::string> names = inorderTraversal(head);
+    for (size_t i = 0; i < names.size(); ++i) 
+    {
+        std::cout << names[i];
+        if (i < names.size() - 1) 
+        {
+            std::cout << ", ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+void printInorder() {};
+
+void printPreorder() {};
+void printPostorder() {};
+void printLevelCount() {};
+
 // Utility methods
+unsigned int getSize() {return 1; };
+bool isEmpty() {return false; };
 Student* StudentAVLTree::rightRotate(Student *y)
 {
     Student* x = y->GetLeft();
@@ -193,7 +233,6 @@ int StudentAVLTree::height(Student *s)
     return std::max(height(s->GetLeft()), height(s->GetRight())) + 1;
 }
 int StudentAVLTree::getBalance(Student *s)
-
 {
     return height(s->GetLeft()) - height(s->GetRight());
 }

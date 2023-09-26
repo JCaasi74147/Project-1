@@ -2,6 +2,8 @@
 #define STUDENTAVLTREE_H
 #include "Student.h"
 #include <stack>
+#include <vector>
+#include <iostream>
 
 class StudentAVLTree
 {
@@ -20,11 +22,11 @@ public:
     // Search/traversal
     void searchID(unsigned int id);
     void searchName(const std::string &name);
+    std::vector<std::string> inorderTraversal(Student* current);
     void printInorder();
     void printPreorder();
     void printPostorder();
     void printLevelCount();
-    int findHeight();
 
     // utility methods
     unsigned int getSize() const;
@@ -34,6 +36,12 @@ public:
     int height(Student *s);
     int getBalance(Student *s);
     void printID(unsigned int id);
+    void printRelationship(Student *node, const std::string &parentName) {
+        if (node == nullptr) return;
+        std::cout << "Parent: " << parentName << ", Child: " << node->GetName() << std::endl;
+        printRelationship(node->GetLeft(), node->GetName());
+        printRelationship(node->GetRight(), node->GetName());
+    }
 
 private:
     Student* head;
