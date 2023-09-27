@@ -15,8 +15,8 @@ public:
 
     // Modifications
     void insert(const std::string &name, unsigned int id);
-    void remove(unsigned int id);
-    void removeInorder(int n);
+    void remove(unsigned int id, bool backtrack = true);
+    void removeNthInorder(int n);
     void backtrackAndBalance(std::stack<Student*> parents);
 
     // Search/traversal

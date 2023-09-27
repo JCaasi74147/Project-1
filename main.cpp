@@ -2,16 +2,61 @@
 #include "StudentAVLTree.h"
 #include <string>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 
 int main()
 {
+    std::string line, command, name;
+    int id, n;
     StudentAVLTree tree;
-    tree.insert("hey", 99999999);
-    tree.insert("why", 809);
-    tree.insert("when", 6581484);
-    tree.insert("okay", 1);
-    tree.insert("lol", 3);
-    tree.insert("rey", 69000000);
-    tree.searchID(6581484);
+    std::getline(std::cin, line);
+    while (std::getline(std::cin, line))
+    {
+        std::istringstream iss(line);
+        iss >> command;
+
+        if (command == "insert")
+        {
+            iss >> std::quoted(name) >> id;
+            tree.insert(name, id);
+        }
+        else if (command == "remove")
+        {
+            iss >> id;
+            tree.remove(id);
+        }
+        else if (command == "search")
+        {
+            char firstChar = iss.peek();
+            if (firstChar == '\"')
+            {
+                iss >> std::quoted(name);
+                tree.searchName(name);
+            }
+            else
+            {
+                iss >> id;
+                tree.searchID(id);
+            }
+        }
+        else if (command == "printInorder")
+        {
+            tree.printInorder();
+        }
+        else if (command == "printPreorder")
+        {
+            tree.printPreorder();
+        }
+        else if (command == "printPostorder")
+        {
+            tree.printPostorder();
+        }
+        else if (command == "removeInorder")
+        {
+            iss >> n;
+            tree.removeNthInorder(n);
+        }
+    }
     return 0;
 }

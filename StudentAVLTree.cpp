@@ -3,13 +3,14 @@
 #include <stack>
 #include <queue>
 #include <iostream>
+#include <functional>
 
-void StudentAVLTree::insert(const std::string& name, unsigned int id) 
+void StudentAVLTree::insert(const std::string& name, unsigned int id)
 {
-    Student *toAdd = new Student(name, id);
+    Student* toAdd = new Student(name, id);
 
-    Student *current = head, *parent = head;
-    std::stack<Student*> parents;
+    Student* current = head, * parent = head;
+    std::stack<Student*> parents = {};
 
     while (current)
     {
@@ -17,24 +18,33 @@ void StudentAVLTree::insert(const std::string& name, unsigned int id)
         parents.push(current);
         if (*current < *toAdd) current = current->GetRight();
         else if (*current > *toAdd) current = current->GetLeft();
-        else 
+        else
         {
             delete toAdd;
             std::cout << "unsuccessful" << std::endl;
             return;
         }
     }
-    if (current == parent && !parent) head = toAdd;
-    else if (*parent < *toAdd) parent->SetRight(toAdd);
-    else parent->SetLeft(toAdd);
-    
-    std::cout << "Before Balance:" << std::endl;
-    printRelationship(head, "ROOT");
+    if (current == parent && !parent) {
+        head = toAdd;
+        parents.push(head); 
+    }
+    else if (*parent < *toAdd) {
+        parent->SetRight(toAdd);
+        parents.push(toAdd);
+    }
+    else {
+        parent->SetLeft(toAdd);
+        parents.push(toAdd); 
+    }
     StudentAVLTree::backtrackAndBalance(parents);
-    std::cout << "successful... apparently" << std::endl;
+
+    StudentAVLTree::backtrackAndBalance(parents);
+    std::cout << "successful" << std::endl;
+    size++;
 }
 
-void StudentAVLTree::remove(unsigned int id)
+void StudentAVLTree::remove(unsigned int id, bool backtrack)
 {
     Student *current = head, *parent = nullptr;
     std::stack<Student*> parents;
@@ -62,13 +72,13 @@ void StudentAVLTree::remove(unsigned int id)
             }
             delete current;
         }
-        else if (current->GetRight() || current->GetLeft() && !(current->GetRight() && current->GetLeft())) // one child
+        else if ((current->GetRight() || current->GetLeft()) && (!(current->GetRight() && current->GetLeft()))) // one child
         {
             Student *child = (current->GetRight()) ? current->GetRight() : current->GetLeft();
             if (!parent) head = child;
             else if (current == parent->GetRight()) parent->SetRight(child);
             else parent->SetLeft(child);
-
+            delete current;
         }
         else    // two children
         {
@@ -79,18 +89,41 @@ void StudentAVLTree::remove(unsigned int id)
             }
             std::string tempName = inorderSuccessor->GetName();
             int tempID = inorderSuccessor->GetID();
-            remove(tempID);
+            remove(tempID, false);
             current->SetName(tempName);
             current->SetID(tempID);
         }
-        std::cout << "successful" << std::endl;
+        parents.pop();
+        if (backtrack) { std::cout << "successful" << std::endl; }
+        size--;
     }
-    else { std::cout << "unsuccessful" << std::endl; }
+    else { std::cout << "unsuccessful" << std::endl; return;  }
 
-    StudentAVLTree::backtrackAndBalance(parents);
+    if (backtrack) StudentAVLTree::backtrackAndBalance(parents);
 }
 
-void removeInorder(int n) {};
+void StudentAVLTree::removeNthInorder(int n) {
+    std::stack<Student*> parents;
+    n++;
+
+    // Helper function to find N-th node and its parent
+    std::function<Student* (Student*, int&)> findNthInorder;
+    findNthInorder = [&](Student* root, int& n) -> Student* {
+        if (!root) return nullptr;
+        parents.push(root);
+        Student* left = findNthInorder(root->GetLeft(), n);
+        if (left) return left;
+        if (--n == 0) return root;
+        return findNthInorder(root->GetRight(), n);
+    };
+
+    Student* nodeToRemove = findNthInorder(head, n);
+    if (!nodeToRemove) {
+        std::cout << "unsuccessful" << std::endl;
+        return;
+    }
+    remove(nodeToRemove->GetID());
+}
 
 void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
 {
@@ -106,14 +139,14 @@ void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
         {
             Student *left = current->GetLeft();
             int leftBalance = StudentAVLTree::getBalance(left);
-            if (leftBalance < 0) left = leftRotate(left);
+            if (leftBalance < 0) current->SetLeft(leftRotate(left));
             newRoot = rightRotate(current);
         }
         else if (balance < -1)  // tree is right heavy
         {
             Student *right = current->GetRight();
             int rightBalance = StudentAVLTree::getBalance(right);
-            if (rightBalance > 0) right = rightRotate(right);
+            if (rightBalance > 0) current->SetRight(rightRotate(right));
             newRoot = leftRotate(current);
         }
 
@@ -126,8 +159,6 @@ void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
             }
             else head = newRoot;
         }
-        std::cout << "After Balance:" << std::endl;
-        printRelationship(head, "ROOT");
     }
 }
 
@@ -201,11 +232,62 @@ void StudentAVLTree::printInorder() {
     std::cout << std::endl;
 }
 
-void printInorder() {};
+void StudentAVLTree::printPreorder() 
+{
+    if (!head) return;
+    std::stack<Student*> stk;
+    stk.push(head);
+    std::string output = "";
+    while (!stk.empty())
+    {
+        Student* current = stk.top();
+        stk.pop();
+        output += current->GetName() + ", ";
 
-void printPreorder() {};
-void printPostorder() {};
-void printLevelCount() {};
+        if (current->GetRight()) stk.push(current->GetRight());
+        if (current->GetLeft()) stk.push(current->GetLeft());
+    }
+    if (output.length() > 0) output = output.substr(0, output.length() - 2);
+
+    std::cout << output << std::endl;
+};
+void StudentAVLTree::printPostorder()
+{
+    if (!head) return;
+
+    std::stack<Student*> stk1, stk2;
+    stk1.push(head);
+    std::string output = "";
+
+    while (!stk1.empty())
+    {
+        Student* current = stk1.top();
+        stk1.pop();
+        stk2.push(current);
+
+        if (current->GetLeft()) stk1.push(current->GetLeft());
+        if (current->GetRight()) stk1.push(current->GetRight());
+    }
+
+    while (!stk2.empty())
+    {
+        Student* current = stk2.top();
+        stk2.pop();
+        output += current->GetName() + ", ";
+    }
+
+    if (output.length() > 0) output = output.substr(0, output.length() - 2);
+    std::cout << output << std::endl;
+}
+
+void StudentAVLTree::printLevelCount()
+{
+    if (!head)
+    {
+        std::cout << "0" << std::endl;
+    }
+    std::cout << height(head) << std::endl;
+}
 
 // Utility methods
 unsigned int getSize() {return 1; };
@@ -229,8 +311,7 @@ Student* StudentAVLTree::leftRotate(Student *x)
 int StudentAVLTree::height(Student *s)
 {
     if (!s) return -1;
-    if (!(s->GetLeft()) && !(s->GetRight())) return 0;
-    return std::max(height(s->GetLeft()), height(s->GetRight())) + 1;
+    return 1 + std::max(height(s->GetLeft()), height(s->GetRight()));
 }
 int StudentAVLTree::getBalance(Student *s)
 {
