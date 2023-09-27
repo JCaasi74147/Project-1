@@ -1,5 +1,4 @@
-#ifndef STUDENTAVLTREE_H
-#define STUDENTAVLTREE_H
+#pragma once
 #include "Student.h"
 #include <stack>
 #include <vector>
@@ -14,13 +13,13 @@ public:
     StudentAVLTree(Student* h, unsigned int s) : head(h), size(s) {};
 
     // Modifications
-    void insert(const std::string &name, unsigned int id);
-    void remove(unsigned int id, bool backtrack = true);
+    void insert(const std::string &name, const std::string &stringID);
+    void remove(const std::string &stringID, bool backtrack = true);
     void removeNthInorder(int n);
     void backtrackAndBalance(std::stack<Student*> parents);
 
     // Search/traversal
-    void searchID(unsigned int id);
+    void searchID(std::string stringID);
     void searchName(const std::string &name);
     std::vector<std::string> inorderTraversal(Student* current);
     void printInorder();
@@ -29,23 +28,18 @@ public:
     void printLevelCount();
 
     // utility methods
-    unsigned int getSize() const;
-    bool isEmpty() const;
+    int getSize() { return size; }
+    int IDConversion(const std::string &stringID);
+    std::string itos(int ID);
     Student* rightRotate(Student *y);
     Student* leftRotate(Student *x);
     int height(Student *s);
     int getBalance(Student *s);
     void printID(unsigned int id);
-    void printRelationship(Student *node, const std::string &parentName) {
-        if (node == nullptr) return;
-        std::cout << "Parent: " << parentName << ", Child: " << node->GetName() << std::endl;
-        printRelationship(node->GetLeft(), node->GetName());
-        printRelationship(node->GetRight(), node->GetName());
-    }
-
-private:
+    bool isTreeBalanced();
+    bool isBalanced(Student* node);
     Student* head;
-    unsigned int size;
+    bool isValidName(const std::string& name);
+private:
+    int size;
 };
-
-#endif

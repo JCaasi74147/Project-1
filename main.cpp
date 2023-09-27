@@ -1,4 +1,3 @@
-#include "Student.h"
 #include "StudentAVLTree.h"
 #include <string>
 #include <iostream>
@@ -7,8 +6,8 @@
 
 int main()
 {
-    std::string line, command, name;
-    int id, n;
+    std::string line, command, name, id;
+    int n;
     StudentAVLTree tree;
     std::getline(std::cin, line);
     while (std::getline(std::cin, line))
@@ -28,7 +27,7 @@ int main()
         }
         else if (command == "search")
         {
-            char firstChar = iss.peek();
+            auto firstChar = iss.peek();
             if (firstChar == '\"')
             {
                 iss >> std::quoted(name);
@@ -56,6 +55,10 @@ int main()
         {
             iss >> n;
             tree.removeNthInorder(n);
+        }
+        else
+        {
+            std::cout << "unsuccessful" << std::endl;
         }
     }
     return 0;

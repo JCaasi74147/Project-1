@@ -4,11 +4,18 @@
 #include <queue>
 #include <iostream>
 #include <functional>
+#include <cctype>
 
-void StudentAVLTree::insert(const std::string& name, unsigned int id)
+void StudentAVLTree::insert(const std::string& name, const std::string& stringID)
 {
-    Student* toAdd = new Student(name, id);
+    int id = IDConversion(stringID);
+    if (!isValidName(name) || !(id > 9999999 && id < 100000000)) 
+    {
+        std::cout << "unsuccessful" << std::endl; 
+        return;
+    }
 
+    Student* toAdd = new Student(name, id);
     Student* current = head, * parent = head;
     std::stack<Student*> parents = {};
 
@@ -38,14 +45,13 @@ void StudentAVLTree::insert(const std::string& name, unsigned int id)
         parents.push(toAdd); 
     }
     StudentAVLTree::backtrackAndBalance(parents);
-
-    StudentAVLTree::backtrackAndBalance(parents);
     std::cout << "successful" << std::endl;
     size++;
 }
 
-void StudentAVLTree::remove(unsigned int id, bool backtrack)
+void StudentAVLTree::remove(const std::string &stringID, bool backtrack)
 {
+    int id = IDConversion(stringID);
     Student *current = head, *parent = nullptr;
     std::stack<Student*> parents;
 
@@ -89,13 +95,12 @@ void StudentAVLTree::remove(unsigned int id, bool backtrack)
             }
             std::string tempName = inorderSuccessor->GetName();
             int tempID = inorderSuccessor->GetID();
-            remove(tempID, false);
+            remove(stringID, false);
             current->SetName(tempName);
             current->SetID(tempID);
         }
         parents.pop();
-        if (backtrack) { std::cout << "successful" << std::endl; }
-        size--;
+        if (backtrack) { std::cout << "successful" << std::endl; size--; }
     }
     else { std::cout << "unsuccessful" << std::endl; return;  }
 
@@ -122,7 +127,7 @@ void StudentAVLTree::removeNthInorder(int n) {
         std::cout << "unsuccessful" << std::endl;
         return;
     }
-    remove(nodeToRemove->GetID());
+    remove(StudentAVLTree::itos(nodeToRemove->GetID()));
 }
 
 void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
@@ -164,8 +169,9 @@ void StudentAVLTree::backtrackAndBalance(std::stack<Student*> parents)
 
 
 // Search/traversal
-void StudentAVLTree::searchID(unsigned int id)
+void StudentAVLTree::searchID(std::string stringID)
 {
+    int id = StudentAVLTree::IDConversion(stringID);
     Student* current = head;
     while (current)
     {
@@ -290,9 +296,37 @@ void StudentAVLTree::printLevelCount()
 }
 
 // Utility methods
-unsigned int getSize() {return 1; };
-bool isEmpty() {return false; };
-Student* StudentAVLTree::rightRotate(Student *y)
+int StudentAVLTree::IDConversion(const std::string &stringID)
+{
+    int id;
+    try
+    {
+        id = std::stoi(stringID);
+    }
+    catch (std::invalid_argument &e)
+    {    
+        std::cout << "unsuccessful" << std::endl; 
+        return (-1);
+    }
+    catch (std::out_of_range &e)
+    {
+        std::cout << "unsuccessful" << std::endl; 
+        return (-1);
+    }
+    return id;
+}
+std::string itos(int ID)
+{
+    std::string s = std::to_string(ID);
+    while (s.length() < 8)
+    {
+        s = "0" + s;
+    }
+    return s;
+}
+
+
+Student *StudentAVLTree::rightRotate(Student *y)
 {
     Student* x = y->GetLeft();
     Student* temp = x->GetRight();
@@ -337,4 +371,34 @@ void StudentAVLTree::printID(unsigned int id)
         }
         std::cout << s << std::endl;
     }
+}
+
+bool StudentAVLTree::isTreeBalanced() 
+{
+    return isBalanced(head);
+}
+
+bool StudentAVLTree::isBalanced(Student* node) 
+{
+    if (!node) return true;
+
+    int leftHeight = height(node->GetLeft());
+    int rightHeight = height(node->GetRight());
+    int balanceFactor = leftHeight - rightHeight;
+
+    // Check the balance factor of the current node and then recursively check the left and right subtrees
+    if (std::abs(balanceFactor) <= 1 && isBalanced(node->GetLeft()) && isBalanced(node->GetRight())) {
+        return true;
+    }
+
+    return false;
+}
+
+bool StudentAVLTree::isValidName(const std::string& name) {
+    for (char c : name) {
+        if (!std::isalpha(c) && !std::isspace(c)) {
+            return false;
+        }
+    }
+    return true;
 }

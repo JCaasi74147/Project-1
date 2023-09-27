@@ -1,5 +1,4 @@
-#ifndef STUDENT_H
-#define STUDENT_H
+#pragma once
 #include <string>
 
 class Student
@@ -16,7 +15,7 @@ public:
     }
     // Getters and setters
     std::string GetName() const { return name; }
-    unsigned int GetID() const { return ID; }
+    int GetID() const { return ID; }
     Student* GetLeft() const { return left; }
     Student* GetRight() const { return right; }
     void SetName(const std::string &n)  { name = n; }
@@ -36,5 +35,3 @@ private:
     Student *left;
     Student *right;
 };
-
-#endif
