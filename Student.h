@@ -7,8 +7,8 @@ class Student
 public:
     // Constructors and destructor
     Student() : name(""), ID(0), left(nullptr), right(nullptr) {};
-    Student(std::string name, unsigned int id) : name(name), ID(id), left(nullptr), right(nullptr) {};
-    Student(std::string name, unsigned int id, Student *left, Student *right) : name(name), ID(id), left(left), right(right) {};
+    Student(std::string n, unsigned int id) : name(n), ID(id), left(nullptr), right(nullptr) {};
+    Student(std::string n, unsigned int id, Student *l, Student *r) : name(n), ID(id), left(l), right(r) {};
     ~Student()
     {
         left = nullptr;
@@ -21,8 +21,8 @@ public:
     Student* GetRight() const { return right; }
     void SetName(const std::string &n)  { name = n; }
     void SetID(unsigned int id) { ID = id; }
-    Student& SetLeft(Student* left) { this->left = left; return *this; }    // return *this for method-chaining children pointers
-    Student& SetRight(Student* right) {this->right = right; return *this; }
+    Student& SetLeft(Student* l) { this->left = l; return *this; }    // return *this for method-chaining children pointers
+    Student& SetRight(Student* r) {this->right = r; return *this; }
 
     // Operator overloading for comparisons
     bool operator==(const Student &other) const { return ID == other.ID; }

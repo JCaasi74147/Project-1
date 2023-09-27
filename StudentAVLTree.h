@@ -10,8 +10,8 @@ class StudentAVLTree
 public:
     // Constructors
     StudentAVLTree() : head(nullptr), size(0) {};
-    StudentAVLTree(Student* head) : head(head), size(1) {};
-    StudentAVLTree(Student* head, unsigned int size) : head(head), size(size) {};
+    StudentAVLTree(Student* h) : head(h), size(1) {};
+    StudentAVLTree(Student* h, unsigned int s) : head(h), size(s) {};
 
     // Modifications
     void insert(const std::string &name, unsigned int id);
